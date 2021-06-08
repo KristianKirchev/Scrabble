@@ -1,15 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-int validation(char letters[], char word[]){
-
-}
+#include <string.h>
 
 int start(int turns, int letters){
 
     char rand_letters[letters];
     time_t t;
     srand((unsigned) time(&t));
+    char answer[30];
+    int points = 0;
 
     for(int i = 0; i < turns; i++){
 
@@ -22,9 +21,15 @@ int start(int turns, int letters){
         for(int k = 0; k < letters; k++){
             printf("%c ", rand_letters[k]);
         }
-
         printf("\n");
+
+        printf("Enter a word: ");
+        scanf("%s", answer);
+
+        points += strlen(answer);
     }
+
+    return points;
 }
 
 int settings(int *turns, int *letters){
@@ -57,6 +62,7 @@ int settings(int *turns, int *letters){
           return letters;
 
         case 2:
+
           do{
             printf("Enter number of turns (current number is %d)(THE MAX COUNT OF TURNS IS 25): ", *turns);
             scanf("%d", &count_Turns);
@@ -64,6 +70,14 @@ int settings(int *turns, int *letters){
 
           *turns = count_Turns;
           return turns;
+
+        do{
+            printf("Enter number of turns (current number is %d): ", *turns);
+            scanf("%d", &command);
+        }while(command < 1);
+        *turns = command;
+            return turns;
+
 
         case 3:
           break;
@@ -167,7 +181,7 @@ int main()
 
     switch(command){
         case 1:
-          start(turns, letters);
+          printf("You got %d points!", start(turns, letters));
           goto start;
         case 2:
           settings(&turns, &letters);
