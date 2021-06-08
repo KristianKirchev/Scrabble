@@ -1,5 +1,6 @@
 # depslib dependency file v1.0
-1623170113 source:c:\users\owner\documents\documents\asd\scrabble\main.c
+1623185362 source:c:\users\owner\documents\documents\asd\scrabble\main.c
 	<stdio.h>
 	<stdlib.h>
+	<string.h>
 
