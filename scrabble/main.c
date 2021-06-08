@@ -42,23 +42,28 @@ int settings(int *turns, int *letters){
     printf("-----------\n");
 
 
+    int count_Letters;
+    int count_Turns;
+
     switch(command){
 
         case 1:
           do{
-            printf("Enter number of letters (current number is %d): ", *letters);
-            scanf("%d", &command);
-          }while(command < 1);
+            printf("Enter number of letters (current number is %d)(THE MAX COUNT OF LETTERS IS 30): ", *letters);
+            scanf("%d\n", &count_Letters);
+          }while(count_Letters < 1 || count_Letters > 30);
 
-          *letters = command;
+          *letters = count_Letters;
           return letters;
 
-        case 2: do{
-            printf("Enter number of turns (current number is %d): ", *turns);
-            scanf("%d", &command);
-                }while(command < 1);
-            *turns = command;
-            return turns;
+        case 2:
+          do{
+            printf("Enter number of turns (current number is %d)(THE MAX COUNT OF TURNS IS 25): ", *turns);
+            scanf("%d", &count_Turns);
+          }while(count_Turns < 1 || count_Turns > 25);
+
+          *turns = count_Turns;
+          return turns;
 
         case 3:
           break;
@@ -69,9 +74,74 @@ int settings(int *turns, int *letters){
 
 
 
-int enter_Word(){
-  printf("entering...\n");
-  return;
+void add_Words(){
+
+  FILE *dict;
+
+  char current_Word[100];
+
+  int count_Words;
+
+  do{
+    printf("\nHow many words do you want to enter: ");
+    scanf("%d", &count_Words);
+  }while(count_Words < 0);
+
+  dict = fopen("../dict.txt", "a");
+
+  for(int i = -1; i < count_Words; i++){
+    if(i == -1){
+      fgets(current_Word, sizeof(current_Word), stdin);
+      continue;
+    }
+      printf("\nWord number[%d]: ", i+1);
+      fgets(current_Word, sizeof(current_Word), stdin);
+      fprintf(dict, "%s", current_Word);
+  }
+
+  fclose(dict);
+}
+
+
+void delete_Words(){
+  FILE *dict;
+  dict = fopen("../dict.txt", "w");
+  fclose(dict);
+}
+
+
+void enter_Words(){
+
+  int command;
+
+  printf("\nWhat action do you want to perform?\n");
+  printf("Add words: (1)\nDelete all words: (2)\nBack to main menu: (3)\n");
+
+  do{
+        printf("Enter command: ");
+        scanf("%d", &command);
+    }while(command > 3 || command < 1);
+
+    printf("-----------\n");
+
+    switch(command){
+
+        case 1:
+
+          add_Words();
+          break;
+
+        case 2:
+
+          delete_Words();
+          break;
+
+        case 3:
+          break;
+
+    }
+
+    return;
 }
 
 int main()
@@ -103,7 +173,7 @@ int main()
           settings(&turns, &letters);
           goto start;
         case 3:
-          enter_Word();
+          enter_Words();
           goto start;
         case 4:
           printf("Thank you for playing!");
