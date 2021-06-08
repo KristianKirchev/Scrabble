@@ -1,14 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int validation(char letters[], char word[]){
 
-int start(){
-
-  printf("there is no game :(\n");
-  return;
 }
 
+int start(int turns, int letters){
 
+    char rand_letters[letters];
+    time_t t;
+    srand((unsigned) time(&t));
+
+    for(int i = 0; i < turns; i++){
+
+        for(int j = 0; j < letters; j++){
+            rand_letters[j] = 'a' + (rand() % 26);
+        }
+
+        printf("Turn [%d]: ", i+1);
+
+        for(int k = 0; k < letters; k++){
+            printf("%c ", rand_letters[k]);
+        }
+
+        printf("\n");
+    }
+}
 
 int settings(int *turns, int *letters){
 
@@ -80,7 +97,7 @@ int main()
 
     switch(command){
         case 1:
-          start();
+          start(turns, letters);
           goto start;
         case 2:
           settings(&turns, &letters);
