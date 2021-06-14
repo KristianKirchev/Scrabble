@@ -1,7 +1,8 @@
-aba
-baba
-gaba
-jaba
-baba
-ajs
-jdhfe
+sell
+stock
+buy
+stop
+bid
+bell
+bull
+bear
