@@ -5,15 +5,20 @@
 int start(int turns, int letters) {
 
   char rand_letters[letters];
+  char vowels[] = "aeiou";
   time_t t;
   srand((unsigned) time(&t));
   char answer[30];
   int points = 0;
 
+  printf("Hint: type (reshuffle) to get new letters\n");
+
   for(int count_Turns = 0; count_Turns < turns; count_Turns++) {
 
+    reshuffle:
+    rand_letters[0] = vowels[rand() % 5];
     for(int fill_Rand_Arr = 0; fill_Rand_Arr < letters; fill_Rand_Arr++) {
-      rand_letters[fill_Rand_Arr] = 'a' + (rand() % 26);
+      rand_letters[fill_Rand_Arr + 1] = 'a' + (rand() % 26);
     }
 
     printf("Turn [%d]: ", count_Turns+1);
@@ -26,6 +31,11 @@ int start(int turns, int letters) {
 
     printf("Enter a word: ");
     scanf("%s", answer);
+
+    if(strcmp(answer, "reshuffle") == 0){
+        printf("---reshuffling---\n");
+        goto reshuffle;
+    }
 
     points += strlen(answer);
   }
@@ -189,7 +199,6 @@ int main() {
   int turns = 10;
   int letters = 10;
 
-
 start:
   printf(" \n\n-----------\nSCRABBLE\n-----------\n\n\n");
   printf("Start: (1)\nSettings: (2)\nEnter word: (3)\nExit: (4)\n");
@@ -220,7 +229,6 @@ start:
 
   case 4:
     printf("Thank you for playing!");
-    exit(0);
   }
 
   return 0;
