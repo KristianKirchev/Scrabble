@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1623783825 source:c:\users\owner\documents\documents\asd\randomiser\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
