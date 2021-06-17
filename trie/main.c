@@ -1,6 +1,9 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define NUMBER_OF_WORDS (354935)
+#define INPUT_WORD_SIZE (100)
 
 struct trie_node_t{
     char letter;
@@ -37,6 +40,7 @@ int insert_trie_node(struct trie_node_t *root, char *word){
         }
             tmp = tmp->children[(word[i] - 'a')];
     }
+    printf("%d\n", sizeof(word[5]));
     tmp->is_leaf = 1;
     return 1;
 }
@@ -65,7 +69,7 @@ void print_trie(struct trie_node_t *root){
         return;
     }
     int i;
-    for(i = 0; i < 8; i++){
+    for(i = 0; i < longest_word + 2; i++){
         print_level(root, i);
         printf("\n");
     }
@@ -74,13 +78,45 @@ void print_trie(struct trie_node_t *root){
 
 int main()
 {
+
+    //fill_trie:
+
+    int word_count = 0;
+    char *words[NUMBER_OF_WORDS];
+    FILE *fp = fopen("../dict.txt", "r");
+
+    if (fp == 0)
+    {
+        fprintf(stderr, "Dictionary missing, create \"dict.txt\" file in Scrabble folder!!!");
+        exit(1);
+    }
+
+    words[word_count] = malloc(INPUT_WORD_SIZE);
+
+    while (fgets(words[word_count], INPUT_WORD_SIZE, fp))
+    {
+        word_count++;
+        words[word_count] = malloc(INPUT_WORD_SIZE);
+    }
+
     struct trie_node_t *root = malloc(sizeof(struct trie_node_t));
     root = create_trie_node();
-    insert_trie_node(root, "apple");
+
+    for (int i = 0; i < NUMBER_OF_WORDS; i++)
+    {
+        insert_trie_node(root, words[i]);
+    }
+
+
+    //fclose("../dict.txt");
+
+
+    /*insert_trie_node(root, "apple");
     insert_trie_node(root, "applew");
     insert_trie_node(root, "and");
     insert_trie_node(root, "ant");
     insert_trie_node(root, "bike");
+    */
     printf("Trie:\n");
     print_trie(root);
 
