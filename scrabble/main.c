@@ -1,11 +1,127 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define NUMBER_OF_WORDS (354935)
+#define INPUT_WORD_SIZE (45)
 
-int start(int turns, int letters) {
+struct trie_node_t{
+    char letter;
+    int is_leaf;
+    struct trie_node_t *children[26];
+};
+
+struct trie_node_t *create_trie_node(){
+    struct trie_node_t *new_node = malloc(sizeof(struct trie_node_t));
+    new_node->is_leaf = 0;
+    new_node->letter = NULL;
+    for(int i = 0; i < 26; i++){
+        new_node->children[i] = NULL;
+    }
+    return new_node;
+}
+
+int longest_word = 0;
+
+int insert_trie_node(struct trie_node_t *root, char *word){
+    struct trie_node_t *tmp = root;
+
+
+    int size = find_Size(word);
+    if(size - 1 > longest_word){
+      longest_word = size;
+    }
+
+    int i;
+
+    for(i = 0; i < strlen(word); i++){
+        //printf("%c\n", word[i]);
+        if(word[i] >= 'a' && word[i] <= 'z'){
+
+            if(tmp->children[(word[i] - 'a')] == NULL){
+                tmp->children[(word[i] - 'a')] = create_trie_node();
+                tmp->children[(word[i] - 'a')]->letter = word[i];
+            }
+            tmp = tmp->children[(word[i] - 'a')];
+        }
+    }
+    tmp->is_leaf = 1;
+    return 1;
+}
+
+int debug(char *word){
+    int i = 0;
+    while(word[i] != '\n'){
+        if(word[i] < 'a' || word[i] > 'z'){
+            return 0;
+        }
+        i++;
+    }
+
+    return 1;
+}
+
+int find_Size(char *word){
+    int i;
+    for(i = 0; word[i] != '\n'; i++);
+    //printf("\n%d\n", i);
+    //printf("%s", word);
+    return i;
+}
+
+void shuffle(char *word, int letters){
+
+    char temp;
+    int rand_index;
+
+    for(int i = 0; i < letters; i++){
+
+        rand_index = (rand() % (letters - i)) + i;
+        temp = word[i];
+        word[i] = word[rand_index];
+        word[rand_index] = temp;
+    }
+
+    return;
+}
+
+void random_word(struct trie_node_t *root, int letters, char *word){
+    struct trie_node_t *current = root;
+    int random_index;
+    time_t t;
+    srand((unsigned) time(&t));
+
+    for(int i = 0; i < letters; i++){
+
+        int not_null[26];
+        int index_number = 0;
+
+        for(int j = 0; j < 26; j++){
+
+            if(current->children[j] != NULL){
+
+                not_null[index_number] = j;
+                index_number++;
+            }
+        }
+
+        if(index_number > 0){
+            random_index = (rand() % index_number);
+            current = current->children[not_null[random_index]];
+            word[i] = current->letter;
+
+        }
+
+        else{
+            word[i] = 'a' + (rand() % 26);
+        }
+    }
+    shuffle(word, letters);
+    return;
+}
+
+int start(struct trie_node_t* root, int turns, int letters) {
 
   char rand_letters[letters];
-  char vowels[] = "aeiou";
   time_t t;
   srand((unsigned) time(&t));
   char answer[30];
@@ -16,11 +132,7 @@ int start(int turns, int letters) {
   for(int count_Turns = 0; count_Turns < turns; count_Turns++) {
 
     reshuffle:
-    rand_letters[0] = vowels[rand() % 5];
-    for(int fill_Rand_Arr = 0; fill_Rand_Arr < letters; fill_Rand_Arr++) {
-      rand_letters[fill_Rand_Arr + 1] = 'a' + (rand() % 26);
-    }
-
+    random_word(root, letters, rand_letters);
     printf("Turn [%d]: ", count_Turns+1);
 
     for(int print_Letters = 0; print_Letters < letters; print_Letters++) {
@@ -195,9 +307,40 @@ void enter_Words() {
 
 
 int main() {
+
+  int word_count = 0;
+  char *words[NUMBER_OF_WORDS];
+  FILE *fp = fopen("Scrabble/dict.txt", "r");
+
   int command;
   int turns = 10;
   int letters = 10;
+
+  if (fp == 0)
+    {
+        fprintf(stderr, "Dictionary missing, create \"dict.txt\" file in Scrabble folder!!!");
+        exit(1);
+    }
+
+    words[word_count] = malloc(INPUT_WORD_SIZE);
+
+    while (fgets(words[word_count], INPUT_WORD_SIZE, fp))
+    {
+        word_count++;
+        words[word_count] = malloc(INPUT_WORD_SIZE);
+    }
+
+    struct trie_node_t *root = malloc(sizeof(struct trie_node_t));
+    root = create_trie_node();
+
+    for (int i = 0; i < NUMBER_OF_WORDS; i++)
+    {
+        if(debug(words[i]) != 1){
+            break;
+        }
+        insert_trie_node(root, words[i]);
+
+    }
 
 start:
   printf(" \n\n-----------\nSCRABBLE\n-----------\n\n\n");
@@ -216,7 +359,7 @@ start:
   switch(command) {
 
   case 1:
-    printf("You got %d points!", start(turns, letters));
+    printf("You got %d points!", start(root, turns, letters));
     goto start;
 
   case 2:

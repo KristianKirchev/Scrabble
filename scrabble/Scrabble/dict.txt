@@ -1,0 +1,9 @@
+sell
+stock
+buy
+stop
+bid
+bell
+bull
+bear
+amongus
