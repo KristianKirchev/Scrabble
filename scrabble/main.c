@@ -127,7 +127,7 @@ int start(struct trie_node_t* root, int turns, int letters) {
   char answer[30];
   int points = 0;
 
-  printf("Hint: type (reshuffle) to get new letters\n");
+  printf("Hint: type (reshuffle) to get new letters\nMAKE SURE THE WORD IS IN THE DICTIONARY; IF IT IS NOT, MAKE SURE TO ADD IT!!!\n");
 
   for(int count_Turns = 0; count_Turns < turns; count_Turns++) {
 
@@ -213,7 +213,7 @@ int settings(int *turns, int *letters) {
 
 
 
-void add_Words() {
+int add_Words() {
 
   FILE *dict;
 
@@ -239,11 +239,12 @@ void add_Words() {
   }
 
   fclose(dict);
+  return 1;
 }
 
 
 
-void delete_Words() {
+int delete_Words() {
 
   FILE *dict;
 
@@ -265,15 +266,15 @@ void delete_Words() {
   case 1:
     dict = fopen("../dict.txt", "w");
     fclose(dict);
-    break;
+    return 1;
   case 2:
-    break;
+    return 0;
   }
 }
 
 
 
-void enter_Words() {
+int enter_Words() {
 
   int command;
 
@@ -287,23 +288,33 @@ void enter_Words() {
 
   printf("-----------\n");
 
+  int changed;
+
   switch(command) {
 
   case 1:
-    add_Words();
+    changed = add_Words();
     break;
 
   case 2:
-    delete_Words();
+    changed = delete_Words();
     break;
 
   case 3:
     break;
   }
 
-  return;
+  if(changed == 1){
+    return 1;
+  }
+
+  return 0;
 }
 
+
+void delete_Trie(struct trie_node_t **trie, char *words){
+
+}
 
 
 int main() {
@@ -311,6 +322,8 @@ int main() {
   int word_count = 0;
   char *words[NUMBER_OF_WORDS];
   FILE *fp = fopen("Scrabble/dict.txt", "r");
+
+  redoTrie:
 
   int command;
   int turns = 10;
@@ -356,6 +369,8 @@ start:
   printf("-----------\n");
 
 
+  int is_Changed;
+
   switch(command) {
 
   case 1:
@@ -367,7 +382,11 @@ start:
     goto start;
 
   case 3:
-    enter_Words();
+    is_Changed = enter_Words();
+    if(is_Changed == 1){
+      delete_Trie(&root, &words);
+      goto redoTrie;
+    }
     goto start;
 
   case 4:
