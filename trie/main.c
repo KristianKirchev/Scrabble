@@ -1,9 +1,8 @@
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #define NUMBER_OF_WORDS (354935)
-#define INPUT_WORD_SIZE (100)
+#define INPUT_WORD_SIZE (45)
 
 struct trie_node_t{
     char letter;
@@ -21,13 +20,23 @@ struct trie_node_t *create_trie_node(){
     return new_node;
 }
 
+int find_Size(char *word){
+    int i;
+    for(i = 0; word[i] != '\n'; i++);
+    printf("\n%d\n", i);
+    printf("%s", word);
+    return i;
+}
+
+
 int longest_word = 0;
 
 int insert_trie_node(struct trie_node_t *root, char *word){
     struct trie_node_t *tmp = root;
 
-    if(sizeof(word) - 1 > longest_word){
-      longest_word = sizeof(word);
+    int size = find_Size(word);
+    if(size - 1 > longest_word){
+      longest_word = size;
     }
 
     int i;
@@ -40,7 +49,6 @@ int insert_trie_node(struct trie_node_t *root, char *word){
         }
             tmp = tmp->children[(word[i] - 'a')];
     }
-    printf("%d\n", sizeof(word[5]));
     tmp->is_leaf = 1;
     return 1;
 }
@@ -69,7 +77,7 @@ void print_trie(struct trie_node_t *root){
         return;
     }
     int i;
-    for(i = 0; i < longest_word + 2; i++){
+    for(i = 0; i < longest_word; i++){
         print_level(root, i);
         printf("\n");
     }
@@ -79,11 +87,10 @@ void print_trie(struct trie_node_t *root){
 int main()
 {
 
-    //fill_trie:
 
     int word_count = 0;
     char *words[NUMBER_OF_WORDS];
-    FILE *fp = fopen("../dict.txt", "r");
+    FILE *fp = fopen("Scrabble/dict.txt", "r");
 
     if (fp == 0)
     {
@@ -104,19 +111,15 @@ int main()
 
     for (int i = 0; i < NUMBER_OF_WORDS; i++)
     {
+        if(words[i] == NULL){
+          break;
+        }
         insert_trie_node(root, words[i]);
     }
 
 
-    //fclose("../dict.txt");
 
 
-    /*insert_trie_node(root, "apple");
-    insert_trie_node(root, "applew");
-    insert_trie_node(root, "and");
-    insert_trie_node(root, "ant");
-    insert_trie_node(root, "bike");
-    */
     printf("Trie:\n");
     print_trie(root);
 
