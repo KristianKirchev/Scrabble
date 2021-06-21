@@ -316,14 +316,36 @@ void delete_Trie(struct trie_node_t **trie, char *words){
 
 }
 
+void display_Trie_in_File(struct trie_node_t* root, char word[], int level){
+  if(root->is_leaf == 0){
+    FILE *trie_file = fopen("../trie_file.txt", "a");
+    fprintf(trie_file, "%s", word);
+    fprintf(trie_file, "%c", '\n');
+    fclose(trie_file);
+  }
+
+  for(int i = 0; i < 26; i++){
+    if(root->children[i]){
+      word[level] = i + 'a';
+      display_Trie_in_File(root->children[i], word, level + 1);
+    }
+  }
+}
 
 int main() {
 
+  redoTrie:
+
+  printf("");
+  struct trie_node_t *root = malloc(sizeof(struct trie_node_t));
+  root = create_trie_node();
+
+
+
   int word_count = 0;
   char *words[NUMBER_OF_WORDS];
-  FILE *fp = fopen("Scrabble/dict.txt", "r");
+  FILE *fp = fopen("../dict.txt", "r");
 
-  redoTrie:
 
   int command;
   int turns = 10;
@@ -343,8 +365,6 @@ int main() {
         words[word_count] = malloc(INPUT_WORD_SIZE);
     }
 
-    struct trie_node_t *root = malloc(sizeof(struct trie_node_t));
-    root = create_trie_node();
 
     for (int i = 0; i < NUMBER_OF_WORDS; i++)
     {
@@ -354,6 +374,11 @@ int main() {
         insert_trie_node(root, words[i]);
 
     }
+
+    char trie_words[INPUT_WORD_SIZE];
+    int level = 0;
+    display_Trie_in_File(root, trie_words, level);
+
 
 start:
   printf(" \n\n-----------\nSCRABBLE\n-----------\n\n\n");
@@ -385,6 +410,7 @@ start:
     is_Changed = enter_Words();
     if(is_Changed == 1){
       delete_Trie(&root, &words);
+      free(trie_words);
       goto redoTrie;
     }
     goto start;
