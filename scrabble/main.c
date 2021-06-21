@@ -471,6 +471,8 @@ start:
     if(is_Changed == 1){
       delete_Trie(&root, &words);
       free(trie_words);
+      FILE *trie_file = fopen("../trie_file.txt", "w");
+      fclose(trie_file);
       goto redoTrie;
     }
     goto start;
@@ -479,5 +481,7 @@ start:
     printf("Thank you for playing!");
   }
 
+  FILE *trie_file = fopen("../trie_file.txt", "w");
+  fclose(trie_file);
   return 0;
 }
