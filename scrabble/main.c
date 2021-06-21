@@ -119,6 +119,60 @@ void random_word(struct trie_node_t *root, int letters, char *word){
     return;
 }
 
+int search(struct trie_node_t *root, char *word)
+{
+    if(root == NULL) {
+        return 0;
+    }
+
+    struct trie_node_t* curr = root;
+
+    for(int i = 0; word[i] != 0; i++){
+
+        curr = curr->children[word[i] - 'a'];
+        if(curr == NULL){
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+int validation(struct trie_node_t *root, char *answer, char *letters){
+    int flag;
+
+    if(strlen(answer)>strlen(letters)){
+
+        return 0;
+    }
+
+    for(int i = 0; answer[i] != 0; i++){
+
+        for(int j = 0; letters[j] != 0; j++){
+
+            if(answer[i] == letters[j]){
+
+                flag = 0;
+                letters[j] ='!';
+                goto located;
+            }
+            else{
+                flag = 1;
+            }
+        }
+        located:
+        if(flag == 1){
+            return 0;
+        }
+    }
+
+    if(search(root, answer) == 0){
+        return 0;
+    }
+
+    return 1;
+}
+
 int start(struct trie_node_t* root, int turns, int letters) {
 
   char rand_letters[letters];
@@ -127,7 +181,7 @@ int start(struct trie_node_t* root, int turns, int letters) {
   char answer[30];
   int points = 0;
 
-  printf("Hint: type (reshuffle) to get new letters\nMAKE SURE THE WORD IS IN THE DICTIONARY; IF IT IS NOT, MAKE SURE TO ADD IT!!!\n");
+  printf("Hint: type (reshuffle) to get new letters\n");
 
   for(int count_Turns = 0; count_Turns < turns; count_Turns++) {
 
@@ -141,12 +195,18 @@ int start(struct trie_node_t* root, int turns, int letters) {
 
     printf("\n");
 
+    retry:
     printf("Enter a word: ");
     scanf("%s", answer);
 
     if(strcmp(answer, "reshuffle") == 0){
         printf("---reshuffling---\n");
         goto reshuffle;
+    }
+
+    if(validation(root, answer, rand_letters) != 1){
+        printf("NOT A VALID WORD! TRY AGAIN!\n");
+        goto retry;
     }
 
     points += strlen(answer);
