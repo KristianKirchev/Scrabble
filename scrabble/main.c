@@ -119,60 +119,6 @@ void random_word(struct trie_node_t *root, int letters, char *word){
     return;
 }
 
-int search(struct trie_node_t *root, char *word)
-{
-    if(root == NULL) {
-        return 0;
-    }
-
-    struct trie_node_t* curr = root;
-
-    for(int i = 0; word[i] != 0; i++){
-
-        curr = curr->children[word[i] - 'a'];
-        if(curr == NULL){
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-int validation(struct trie_node_t *root, char *answer, char *letters){
-    int flag;
-
-    if(strlen(answer)>strlen(letters)){
-
-        return 0;
-    }
-
-    for(int i = 0; answer[i] != 0; i++){
-
-        for(int j = 0; letters[j] != 0; j++){
-
-            if(answer[i] == letters[j]){
-
-                flag = 0;
-                letters[j] ='!';
-                goto located;
-            }
-            else{
-                flag = 1;
-            }
-        }
-        located:
-        if(flag == 1){
-            return 0;
-        }
-    }
-
-    if(search(root, answer) == 0){
-        return 0;
-    }
-
-    return 1;
-}
-
 int start(struct trie_node_t* root, int turns, int letters) {
 
   char rand_letters[letters];
@@ -181,7 +127,7 @@ int start(struct trie_node_t* root, int turns, int letters) {
   char answer[30];
   int points = 0;
 
-  printf("Hint: type (reshuffle) to get new letters\n");
+  printf("Hint: type (reshuffle) to get new letters\nMAKE SURE THE WORD IS IN THE DICTIONARY; IF IT IS NOT, MAKE SURE TO ADD IT!!!\n");
 
   for(int count_Turns = 0; count_Turns < turns; count_Turns++) {
 
@@ -195,18 +141,12 @@ int start(struct trie_node_t* root, int turns, int letters) {
 
     printf("\n");
 
-    retry:
     printf("Enter a word: ");
     scanf("%s", answer);
 
     if(strcmp(answer, "reshuffle") == 0){
         printf("---reshuffling---\n");
         goto reshuffle;
-    }
-
-    if(validation(root, answer, rand_letters) != 1){
-        printf("NOT A VALID WORD! TRY AGAIN!\n");
-        goto retry;
     }
 
     points += strlen(answer);
@@ -239,7 +179,7 @@ int settings(int *turns, int *letters) {
     do {
       printf("\nTHE MAX COUNT OF LETTERS IS 30\n");
       printf("Enter number of letters (current number is %d): ", *letters);
-      scanf("%d\n", &count_Letters);
+      scanf("%d", &count_Letters);
     } while(count_Letters < 1 || count_Letters > 30);
 
     *letters = count_Letters;
@@ -255,14 +195,6 @@ int settings(int *turns, int *letters) {
 
     *turns = count_Turns;
     return turns;
-
-    do {
-      printf("Enter number of turns (current number is %d): ", *turns);
-      scanf("%d", &command);
-    } while(command < 1);
-    *turns = command;
-    return turns;
-
 
   case 3:
     break;
@@ -376,12 +308,28 @@ void delete_Trie(struct trie_node_t **trie, char *words){
 
 }
 
-void display_Trie_in_File(struct trie_node_t* root, char word[], int level){
+void display_Trie_in_File(struct trie_node_t* root, char *word, int level){
+  if(root == NULL){
+    return;
+  }
+
   if(root->is_leaf == 0){
     FILE *trie_file = fopen("../trie_file.txt", "a");
     fprintf(trie_file, "%s", word);
     fprintf(trie_file, "%c", '\n');
     fclose(trie_file);
+
+  }
+
+  if(root->is_leaf == 1){
+    FILE *trie_file = fopen("../trie_file.txt", "a");
+    fprintf(trie_file, "%s", word);
+    fprintf(trie_file, "%c", '\n');
+    fclose(trie_file);
+
+    for(int i = 0; word[i] != 0; i++){
+        word[i] = 32;
+    }
   }
 
   for(int i = 0; i < 26; i++){
@@ -394,6 +342,9 @@ void display_Trie_in_File(struct trie_node_t* root, char word[], int level){
 
 int main() {
 
+  int command;
+  int turns = 10;
+  int letters = 10;
   redoTrie:
 
   printf("");
@@ -406,10 +357,6 @@ int main() {
   char *words[NUMBER_OF_WORDS];
   FILE *fp = fopen("../dict.txt", "r");
 
-
-  int command;
-  int turns = 10;
-  int letters = 10;
 
   if (fp == 0)
     {
@@ -471,8 +418,6 @@ start:
     if(is_Changed == 1){
       delete_Trie(&root, &words);
       free(trie_words);
-      FILE *trie_file = fopen("../trie_file.txt", "w");
-      fclose(trie_file);
       goto redoTrie;
     }
     goto start;
@@ -481,7 +426,5 @@ start:
     printf("Thank you for playing!");
   }
 
-  FILE *trie_file = fopen("../trie_file.txt", "w");
-  fclose(trie_file);
   return 0;
 }
