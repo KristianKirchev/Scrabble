@@ -195,6 +195,7 @@ int start(struct trie_node_t* root, int turns, int letters) {
 
     printf("\n");
 
+    retry:
     printf("Enter a word: ");
     scanf("%s", answer);
 
@@ -202,6 +203,12 @@ int start(struct trie_node_t* root, int turns, int letters) {
         printf("---reshuffling---\n");
         goto reshuffle;
     }
+
+    if(validation(root, answer, rand_letters) != 1){
+        printf("NOT A VALID WORD! TRY AGAIN!\n");
+        goto retry;
+    }
+
 
     points += strlen(answer);
   }
