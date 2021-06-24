@@ -135,11 +135,20 @@ int search(struct trie_node_t *root, char *word)
         }
     }
 
-    return 1;
+    if(curr->is_leaf == 1){
+        return 1;
+    }
+
+    return 0;
 }
 
-int validation(struct trie_node_t *root, char *answer, char *letters){
+int validation(struct trie_node_t *root, char answer[], char rand_letters[]){
     int flag;
+    char letters[strlen(rand_letters)];
+
+    for(int i = 0; rand_letters[i] != 0; i++){
+        letters[i] = rand_letters[i];
+    }
 
     if(strlen(answer)>strlen(letters)){
 
@@ -365,9 +374,36 @@ int enter_Words() {
 }
 
 
-void delete_Trie(struct trie_node_t **trie, char *words){
+void delete_Trie(struct trie_node_t *root){
 
+    int not_null[26];
+    int index_number = 0;
+
+    for(int i = 0; i < 26; i++){
+
+        if(root->children[i] != NULL){
+
+            not_null[index_number] = i;
+            index_number++;
+        }
+    }
+
+    if(index_number > 0){
+        for(int i = 0; i < index_number; i++){
+            delete_Trie(root->children[not_null[i]]);
+        }
+    }
+
+    for(int i = 0; i < 26; i++){
+        root->children[i] = NULL;
+    }
+
+    free(root);
+    root = NULL;
+
+    return;
 }
+
 
 void display_Trie_in_File(struct trie_node_t* root, char *word, int level){
   if(root == NULL){
@@ -477,7 +513,7 @@ start:
   case 3:
     is_Changed = enter_Words();
     if(is_Changed == 1){
-      delete_Trie(&root, &words);
+      delete_Trie(&root);
       free(trie_words);
       goto redoTrie;
     }
