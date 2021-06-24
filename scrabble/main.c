@@ -369,7 +369,14 @@ void delete_Trie(struct trie_node_t **trie, char *words){
 
 }
 
-void display_Trie_in_File(struct trie_node_t* root, char *word, int level){
+void printPrintWord(char *print_word, int level){
+
+  FILE *trie_file = fopen("../trie_file.txt", "a");
+  fclose(trie_file);
+}
+
+void display_Trie_in_File(struct trie_node_t* root, char *word, int level, char *print_word){
+
   if(root == NULL){
     return;
   }
@@ -385,6 +392,11 @@ void display_Trie_in_File(struct trie_node_t* root, char *word, int level){
   if(root->is_leaf == 1){
     FILE *trie_file = fopen("../trie_file.txt", "a");
     fprintf(trie_file, "%s", word);
+    fprintf(trie_file, "%s", "\n$");
+    //printPrintWord(print_word, level);
+    for(int i = 0; i < level; i++){
+      fprintf(trie_file, "%c", print_word[i]);
+    }
     fprintf(trie_file, "%c", '\n');
     fclose(trie_file);
 
@@ -396,9 +408,17 @@ void display_Trie_in_File(struct trie_node_t* root, char *word, int level){
   for(int i = 0; i < 26; i++){
     if(root->children[i]){
       word[level] = i + 'a';
-      display_Trie_in_File(root->children[i], word, level + 1);
+      print_word[level] = i + 'a';
     }
+    //if(){
+    //}
+      display_Trie_in_File(root->children[i], word, level + 1, print_word);
   }
+}
+
+void delete_trie_file(){
+  fopen("../trie_file.txt", "w");
+  fclose("../trie_file.txt");
 }
 
 int main() {
@@ -444,8 +464,9 @@ int main() {
     }
 
     char trie_words[INPUT_WORD_SIZE];
+    char print_word[INPUT_WORD_SIZE];
     int level = 0;
-    display_Trie_in_File(root, trie_words, level);
+    display_Trie_in_File(root, trie_words, level, print_word);
 
 
 start:
@@ -479,6 +500,7 @@ start:
     if(is_Changed == 1){
       delete_Trie(&root, &words);
       free(trie_words);
+      delete_trie_file();
       goto redoTrie;
     }
     goto start;
@@ -487,5 +509,6 @@ start:
     printf("Thank you for playing!");
   }
 
+  delete_trie_file();
   return 0;
 }
