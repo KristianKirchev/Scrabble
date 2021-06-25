@@ -367,6 +367,7 @@ int enter_Words() {
   }
 
   if(changed == 1){
+
     return 1;
   }
 
@@ -376,6 +377,7 @@ int enter_Words() {
 
 void delete_Trie(struct trie_node_t *root){
 
+    printf("\nmada\n");
     int not_null[26];
     int index_number = 0;
 
@@ -388,8 +390,10 @@ void delete_Trie(struct trie_node_t *root){
         }
     }
 
+
     if(index_number > 0){
         for(int i = 0; i < index_number; i++){
+            printf("\nmmm%d\n", i);
             delete_Trie(root->children[not_null[i]]);
         }
     }
@@ -438,15 +442,13 @@ void display_Trie_in_File(struct trie_node_t* root, char *word, int level, char 
       word[level] = i + 'a';
       print_word[level] = i + 'a';
     }
-    //if(){
-    //}
       display_Trie_in_File(root->children[i], word, level + 1, print_word);
   }
 }
 
 void delete_trie_file(){
-  fopen("../trie_file.txt", "w");
-  fclose("../trie_file.txt");
+  FILE *fp = fopen("../trie_file.txt", "w");
+  fclose(fp);
 }
 
 int main() {
@@ -524,11 +526,17 @@ start:
     goto start;
 
   case 3:
+
     is_Changed = enter_Words();
+
     if(is_Changed == 1){
+
       delete_Trie(&root);
+
       free(trie_words);
+
       delete_trie_file();
+
       goto redoTrie;
     }
     goto start;
