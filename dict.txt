@@ -6,4 +6,4 @@ bid
 buy
 stock
 sell
-asdasfasdadasdasdasd
+gate
