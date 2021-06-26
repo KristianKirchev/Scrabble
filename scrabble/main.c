@@ -63,9 +63,19 @@ int debug(char *word){
 int find_Size(char *word){
     int i;
     for(i = 0; word[i] != '\n'; i++);
-    //printf("\n%d\n", i);
-    //printf("%s", word);
     return i;
+}
+
+int is_Empty(struct trie_node_t *trie){
+
+    for(int i = 0; i < 26; i++){
+        if(trie->children[i] != NULL){
+
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 void shuffle(char *word, int letters){
@@ -184,13 +194,18 @@ int validation(struct trie_node_t *root, char answer[], char rand_letters[]){
 
 int start(struct trie_node_t* root, int turns, int letters) {
 
+  if(is_Empty(root) == 0){
+    return 0;
+  }
+
   char rand_letters[letters];
   time_t t;
   srand((unsigned) time(&t));
   char answer[30];
   int points = 0;
 
-  printf("Hint: type (reshuffle) to get new letters\nMAKE SURE THE WORD IS IN THE DICTIONARY; IF IT IS NOT, MAKE SURE TO ADD IT!!!\n");
+  printf("\n\n-----------\nGAME START\n-----------\n\n\n");
+  printf("Hint: type (reshuffle) to get new letters\nMAKE SURE THE WORD IS IN THE DICTIONARY; IF IT IS NOT, MAKE SURE TO ADD IT!!!\n\n");
 
   for(int count_Turns = 0; count_Turns < turns; count_Turns++) {
 
@@ -230,7 +245,7 @@ int settings(int *turns, int *letters) {
   int command;
 
 
-  printf("SETTINGS\n-----------\nNumber of letters: (1)\nNumber of turns: (2)\nBack to main menu: (3)\n");
+  printf("\n\n-----------\nSETTINGS\n-----------\n\n\nNumber of letters: (1)\nNumber of turns: (2)\nBack to main menu: (3)\n");
 
   do {
     printf("Enter command: ");
@@ -340,7 +355,7 @@ int enter_Words() {
 
   int command;
 
-  printf("\nWhat action do you want to perform?\n");
+  printf("\nWhat action do you want to perform?\n\n");
   printf("Add words: (1)\nDelete all words: (2)\nBack to main menu: (3)\n");
 
   do {
@@ -377,7 +392,6 @@ int enter_Words() {
 
 void delete_Trie(struct trie_node_t *root){
 
-    printf("\nmada\n");
     int not_null[26];
     int index_number = 0;
 
@@ -393,7 +407,6 @@ void delete_Trie(struct trie_node_t *root){
 
     if(index_number > 0){
         for(int i = 0; i < index_number; i++){
-            printf("\nmmm%d\n", i);
             delete_Trie(root->children[not_null[i]]);
         }
     }
@@ -404,7 +417,6 @@ void delete_Trie(struct trie_node_t *root){
 
     free(root);
     root = NULL;
-
     return;
 }
 
@@ -484,6 +496,7 @@ int main() {
   int command;
   int turns = 10;
   int letters = 10;
+  int score;
   redoTrie:
 
   printf("");
@@ -548,34 +561,41 @@ start:
   switch(command) {
 
   case 1:
-    printf("You got %d points!", start(root, turns, letters));
+    system("cls");
+    score = start(root, turns, letters);
+    system("cls");
+
+    if(score == 0){
+        printf("THE DICTIONARY IS EMPTY!!! FILL IT IN ORDER TO PLAY!!!");
+    }
+    else printf("Your score is %d! Good job!", score);
     goto start;
 
   case 2:
+    system("cls");
     settings(&turns, &letters);
+    system("cls");
     goto start;
 
   case 3:
-
+    system("cls");
     is_Changed = enter_Words();
 
     if(is_Changed == 1){
-
-      delete_Trie(&root);
-
+      delete_Trie(root);
       free(trie_words);
-
       delete_trie_file();
-
+      system("cls");
       goto redoTrie;
     }
+    system("cls");
     goto start;
 
   case 4:
-    printf("Thank you for playing!");
+    system("cls");
+    printf("\nThank you for playing!\n");
   }
 
   delete_trie_file();
   return 0;
 }
-
