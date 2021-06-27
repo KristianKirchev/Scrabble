@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define NUMBER_OF_WORDS (354935)
+#include <time.h>
+#define NUMBER_OF_WORDS (100)
 #define INPUT_WORD_SIZE (45)
 
 struct trie_node_t{
@@ -10,10 +11,16 @@ struct trie_node_t{
     struct trie_node_t *children[26];
 };
 
+int find_Size(char *word){
+    int i;
+    for(i = 0; word[i] != '\n'; i++);
+    return i;
+}
+
 struct trie_node_t *create_trie_node(){
     struct trie_node_t *new_node = malloc(sizeof(struct trie_node_t));
     new_node->is_leaf = 0;
-    new_node->letter = NULL;
+    new_node->letter = 0;
     for(int i = 0; i < 26; i++){
         new_node->children[i] = NULL;
     }
@@ -60,11 +67,6 @@ int debug(char *word){
     return 1;
 }
 
-int find_Size(char *word){
-    int i;
-    for(i = 0; word[i] != '\n'; i++);
-    return i;
-}
 
 int is_Empty(struct trie_node_t *trie){
 
@@ -240,7 +242,7 @@ int start(struct trie_node_t* root, int turns, int letters) {
   return points;
 }
 
-int settings(int *turns, int *letters) {
+int* settings(int *turns, int *letters) {
 
   int command;
 
@@ -268,6 +270,7 @@ int settings(int *turns, int *letters) {
     } while(count_Letters < 1 || count_Letters > 30);
 
     *letters = count_Letters;
+
     return letters;
 
   case 2:
@@ -282,9 +285,7 @@ int settings(int *turns, int *letters) {
     return turns;
 
   case 3:
-    break;
-
-    return;
+    return 0;
   }
 }
 
@@ -420,75 +421,103 @@ void delete_Trie(struct trie_node_t *root){
     return;
 }
 
-void display_Trie_in_File(struct trie_node_t* root, char *word, int level, char *print_word){
+void display_Trie_in_File(FILE *trie_file, struct trie_node_t* root, char *word, int level, char *print_word){
 
   if(root == NULL){
     return;
   }
 
-  if(root->is_leaf == 0){
-    FILE *trie_file = fopen("../trie_file.txt", "a");
-    fprintf(trie_file, "%s", word);
-    fprintf(trie_file, "%c", '\n');
-    fclose(trie_file);
+  fprintf(trie_file, "%s", word);
 
+  if(root->is_leaf == 0){
+    fprintf(trie_file, "%c", '\n');
+//    fclose(trie_file);
   }
 
   if(root->is_leaf == 1){
-    FILE *trie_file = fopen("../trie_file.txt", "a");
-    fprintf(trie_file, "%s", word);
     fprintf(trie_file, "%s", "\n$");
+
     for(int i = 0; i < level; i++){
       fprintf(trie_file, "%c", print_word[i]);
     }
-    fprintf(trie_file, "%c", '\n');
-    fclose(trie_file);
 
-    for(int i = 0; word[i] != 0; i++){
+    fprintf(trie_file, "%c", '\n');
+
+//    fclose(trie_file);
+
+//    for(int i = 0; word[i] != 0; i++){
+//        word[i] = 32;
+//    }
+
+  }
+
+  for(int i = 0; word[i] != 0; i++){
+//      printf(">>>>>> word[%d] = %s\n", i, word);
+
         word[i] = 32;
     }
-  }
+
 
   for(int i = 0; i < 26; i++){
     if(root->children[i]){
       word[level] = i + 'a';
       print_word[level] = i + 'a';
     }
-      display_Trie_in_File(root->children[i], word, level + 1, print_word);
+
+    for(int j = level + 1; j < INPUT_WORD_SIZE; j++){
+      word[j] = 0;
+    }
+
+    display_Trie_in_File(trie_file, root->children[i], word, level + 1, print_word);
   }
 }
+
+void process_Trie_in_File(struct trie_node_t* root, char *word, int level, char *print_word){
+  if(root == NULL){
+    return;
+  }
+
+  FILE *trie_file = fopen("../trie_file.txt", "a");
+
+  display_Trie_in_File(trie_file, root, word, level, print_word);
+
+  fclose(trie_file);
+}
+
 
 void delete_trie_file(){
   FILE *fp = fopen("../trie_file.txt", "w");
   fclose(fp);
 }
 
-void read_trie(char *fill){
+void read_trie(char **fill){
 
   FILE *file = fopen("../trie_file.txt", "r");
-  char word[INPUT_WORD_SIZE];
+  char line[INPUT_WORD_SIZE];
 
-  int word_count = 0;
+  int i = 0;
 
-  fill[word_count] = malloc(INPUT_WORD_SIZE);
-
-  while (fgets(fill[word_count], INPUT_WORD_SIZE, file) != NULL)
+  while (fgets(line, INPUT_WORD_SIZE, file))
   {
-      fputs(fill[word_count], stdout);
-      //fputs()
-      word_count++;
-      fill[word_count] = malloc(INPUT_WORD_SIZE);
+    if(line[0] == '$'){
+      int lineLength = strlen(line);
+
+      printf("line: '%s', strlen: %zu, size: %zu\n", line, lineLength, sizeof(line));
+
+      int wordLength = lineLength - 2;
+      char* s = malloc(wordLength+1);
+      memcpy(s, line + 1, wordLength);
+      s[wordLength] = 0;
+
+      printf("---- fill: '%s', strlen: %zu, size: %zu\n", s, strlen(s), sizeof(s));
+
+      fill[i] = s;
+
+      i++;
+    }
   }
 
-  for (int i = 0; i < NUMBER_OF_WORDS; i++)
-  {
-      if(debug(fill[i]) != 1){
-          break;
-      }
-      printf("\n%s\n", fill[i]);
-
-  }
-
+  fclose(file);
 }
 
 int main() {
@@ -497,6 +526,7 @@ int main() {
   int turns = 10;
   int letters = 10;
   int score;
+
   redoTrie:
 
   printf("");
@@ -537,9 +567,18 @@ int main() {
     char trie_words[INPUT_WORD_SIZE];
     char print_word[INPUT_WORD_SIZE];
     int level = 0;
-    display_Trie_in_File(root, trie_words, level, print_word);
-    char *read_trie_from_file[INPUT_WORD_SIZE];
-    //read_trie(read_trie_from_file);
+
+    for(int i = 0; trie_words[i] != 0; i++){
+        trie_words[i] = 32;
+    }
+
+    process_Trie_in_File(root, trie_words, level, print_word);
+    /*char *read_trie_from_file[NUMBER_OF_WORDS];
+    read_trie(read_trie_from_file);
+
+    for (int i = 0; i < NUMBER_OF_WORDS && read_trie_from_file[i]; i++) {
+      printf("word[%d]: %s\n", i, read_trie_from_file[i]);
+    }*/
 
 
 start:
@@ -583,7 +622,7 @@ start:
 
     if(is_Changed == 1){
       delete_Trie(root);
-      free(trie_words);
+      //free(trie_words);
       delete_trie_file();
       system("cls");
       goto redoTrie;

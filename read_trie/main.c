@@ -4,7 +4,7 @@
 #define NUMBER_OF_WORDS (354935)
 #define INPUT_WORD_SIZE (45)
 
-void read_trie(char *fill){
+void read_trie(char **fill){
 
   FILE *file = fopen("../trie_file.txt", "r");
   char line[INPUT_WORD_SIZE];
@@ -13,22 +13,17 @@ void read_trie(char *fill){
 
   while (fgets(line, INPUT_WORD_SIZE, file))
   {
-
     if(line[0] == '$'){
-      printf("%s\n", line);
-//      fgets(fill, INPUT_WORD_SIZE, line);
+      int lineLength = strlen(line);
 
-      char *s = malloc(strlen(line)-1);
+      printf("line: '%s', strlen: %zu, size: %zu\n", line, lineLength, sizeof(line));
 
-      memset(s, '\0', sizeof(s));
+      int wordLength = lineLength - 2;
+      char* s = malloc(wordLength+1);
+      memcpy(s, line + 1, wordLength);
+      s[wordLength] = 0;
 
-//      printf("1\n");
-
-      strncpy(s, line + 1, strlen(line+1) - 1);
-
-//      printf("2\n");
-
-      printf("---- '%s'\n", s);
+      printf("---- fill: '%s', strlen: %zu, size: %zu\n", s, strlen(s), sizeof(s));
 
       fill[i] = s;
 
@@ -43,4 +38,8 @@ int main(){
 
   char *read_trie_from_file[NUMBER_OF_WORDS];
   read_trie(read_trie_from_file);
+
+  for (int i = 0; i < NUMBER_OF_WORDS && read_trie_from_file[i]; i++) {
+    printf("word[%d]: %s\n", i, read_trie_from_file[i]);
+  }
 }

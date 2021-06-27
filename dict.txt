@@ -7,3 +7,6 @@ buy
 stock
 sell
 gate
+ambulance
+elevator
+bread
