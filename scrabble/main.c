@@ -207,7 +207,7 @@ int start(struct trie_node_t* root, int turns, int letters) {
   int points = 0;
 
   printf("\n\n-----------\nGAME START\n-----------\n\n\n");
-  printf("Hint: type (reshuffle) to get new letters\nMAKE SURE THE WORD IS IN THE DICTIONARY; IF IT IS NOT, MAKE SURE TO ADD IT!!!\n\n");
+  printf("Hint: type (!resh) to get new letters\nMAKE SURE THE WORD IS IN THE DICTIONARY; IF IT IS NOT, MAKE SURE TO ADD IT!!!\n\n");
 
   for(int count_Turns = 0; count_Turns < turns; count_Turns++) {
 
@@ -225,7 +225,7 @@ int start(struct trie_node_t* root, int turns, int letters) {
     printf("Enter a word: ");
     scanf("%s", answer);
 
-    if(strcmp(answer, "reshuffle") == 0){
+    if(strcmp(answer, "!resh") == 0){
         printf("---reshuffling---\n");
         goto reshuffle;
     }

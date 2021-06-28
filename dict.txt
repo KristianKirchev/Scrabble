@@ -10,3 +10,5 @@ gate
 ambulance
 elevator
 bread
+cargo
+car
